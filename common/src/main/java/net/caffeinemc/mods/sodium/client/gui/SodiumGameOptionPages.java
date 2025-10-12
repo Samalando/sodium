@@ -96,21 +96,21 @@ public class SodiumGameOptionPages {
                 .add(OptionImpl.createBuilder(int.class, vanillaOpts)
                         .setName(Component.translatable("options.fullscreen.resolution"))
                         .setTooltip(Component.translatable("sodium.options.fullscreen_resolution.tooltip"))
-                        .setControl(option -> new SliderControl(option, 0, null != monitor? monitor.getModeCount(): 0, 1, ControlValueFormatter.resolution()))
+                        // the max value of 1 when the monitor is not available prevents an exception from being thrown
+                        .setControl(option -> new SliderControl(option, 0, null != monitor ? monitor.getModeCount() : 1, 1, ControlValueFormatter.resolution()))
                         .setBinding((options, value) -> {
                             if (null != monitor) {
-                                window.setPreferredFullscreenVideoMode(0 == value? Optional.empty(): Optional.of(monitor.getMode(value - 1)));
+                                window.setPreferredFullscreenVideoMode(0 == value ? Optional.empty() : Optional.of(monitor.getMode(value - 1)));
                             }
                         }, options -> {
                             if (null == monitor) {
                                 return 0;
-                            }
-                            else {
+                            } else {
                                 Optional<VideoMode> optional = window.getPreferredFullscreenVideoMode();
                                 return optional.map((videoMode) -> monitor.getVideoModeIndex(videoMode) + 1).orElse(0);
                             }
                         })
-                        .setEnabled(() -> OsUtils.getOs() == OsUtils.OperatingSystem.WIN && Minecraft.getInstance().getWindow().findBestMonitor() != null)
+                        .setEnabled(() -> monitor != null && monitor.getModeCount() > 0 && OsUtils.getOs() == OsUtils.OperatingSystem.WIN)
                         .setFlags(OptionFlag.REQUIRES_VIDEOMODE_RELOAD)
                         .build())
                 .add(OptionImpl.createBuilder(boolean.class, vanillaOpts)
