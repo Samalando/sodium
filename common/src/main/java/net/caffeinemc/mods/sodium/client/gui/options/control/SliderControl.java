@@ -160,6 +160,17 @@ public class SliderControl implements Control {
             return false;
         }
 
+        @Override
+        public boolean mouseReleased(MouseButtonEvent event) {
+            if (this.option.isEnabled() && event.button() == 0 && sliderHeld) {
+                sliderHeld = false;
+                playClickSound();
+                return true;
+            }
+
+            return false;
+        }
+
         private void setValueFromMouse(double d) {
             this.setValue((d - (double) this.getSliderX()) / (double) this.getSliderWidth());
         }
